@@ -10,25 +10,30 @@
 #define BUFFER_SIZE 65536
 #define SIZE_BYTES 10
 
+#ifdef CONNECTION_EXPORTS
+#define CONNECTION_API __declspec(dllexport)
+#else
+#define CONNECTION_API __declspec(dllimport)
+#endif
 
-class Client_Down_Exception : public std::exception {
+class CONNECTION_API Client_Down_Exception : public std::exception {
     virtual const char* what() const throw() {
         return "Client down";
     }
 };
 
-class Bad_Socket_Exception : public std::exception {
+class CONNECTION_API Bad_Socket_Exception : public std::exception {
     virtual const char* what() const throw() {
         return "Bad socket";
     }
 };
-class Socket_Error_Exception : public std::exception {
+class CONNECTION_API Socket_Error_Exception : public std::exception {
     virtual const char* what() const throw() {
         return "Unknown socket error";
     }
 };
 
-class Connection
+class CONNECTION_API Connection
 {
 public:
     Connection(int port_number=0, const std::string ip="", const std::string username = "Anon");

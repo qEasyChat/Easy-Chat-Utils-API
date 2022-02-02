@@ -6,7 +6,6 @@
 #include <sstream>
 
 #include "Crypto_Manager.h"
-#include "Server.h"
 #include "Utils.h"
 
 Connection::Connection(int port_number, const std::string ip, const std::string username)
