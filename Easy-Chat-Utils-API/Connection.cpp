@@ -90,7 +90,7 @@ void Connection::send_file(std::string file_path)
     FILE* file = fopen(file_path.c_str(), "rb");
     size_t file_size = ftell(file);
     rewind(file);
-	std::string header = "FILE:" + file_size;
+	std::string header = "FILE " + file_path + " " + std::to_string(file_size);
     send_message(header);
     if (file_size > 0)
     {
@@ -109,6 +109,23 @@ void Connection::send_file(std::string file_path)
     }
     fclose(file);
 }
+
+void Connection::recive_file()
+{
+    std::string header = recive_message();
+    std::vector<std::string> header_args = Utils::string_to_vector<std::string>(header);
+    std::string file_name = header_args[1];
+    size_t file_size = std::stoi(header_args[2]);
+    FILE* file = fopen(file_name.c_str(), "wb");
+    if (file_size > 0)
+    {
+        char buffer[1024];
+        std::string file_str = recive_message();
+        fwrite(&buffer, file_str.size(), file_str.size(), file);
+    }
+    fclose(file);
+}
+
 
 size_t Connection::get_size_from(std::string fixed_length_string)
 {
