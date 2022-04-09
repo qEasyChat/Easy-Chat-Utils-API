@@ -42,6 +42,9 @@ public:
     void send_message(std::string message);
     std::string recive_message();
 
+    void send_file(std::string file_path);
+    void recive_file();
+
     SOCKET get_socket();
     void set_socket(SOCKET socket);
 
