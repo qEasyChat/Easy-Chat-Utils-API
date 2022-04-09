@@ -37,9 +37,6 @@ std::string Connection::get_fixed_length_size(std::string message)
 
 void Connection::send_message(std::string message)
 {
-
-    std::cout << "SENT MESSAGE" << std::endl;
-    std::cout << message << std::endl;
     message = encrypt_message(message);
     std::string encapsulated_string = get_fixed_length_size(message) + message;
     encapsulated_string = MESSAGE_BEGIN_CHECK + encapsulated_string + MESSAGE_END_CHECK;
@@ -53,13 +50,10 @@ void Connection::send_message(std::string message)
             throw Message_Not_Sent_Exception();
         }
     }
-
-    std::cout << message << std::endl;
 }
 
 std::string Connection::recive_message()
 {
-    std::cout << "RECIVED MESSAGE" << std::endl;
     std::string message = "";
     std::string header = get_message(MESSAGE_BEGIN_SIZE);
     if (header != MESSAGE_BEGIN_CHECK)
@@ -81,7 +75,6 @@ std::string Connection::recive_message()
         return ENDING_NOT_FOUND_MESSAGE;
     }
     std::string decrypted_message = decrypt_message(message);
-    std::cout << decrypted_message << std::endl;
     return decrypted_message;
 }
 
@@ -206,3 +199,4 @@ std::string Connection::decrypt_message(std::string package)
     std::string decrypted_message = crypto_manager.rsa_decrypt(encrypted_message);
     return decrypted_message;
 }
+
