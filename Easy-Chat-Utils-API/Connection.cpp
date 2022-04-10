@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Connection.h"
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -35,6 +36,15 @@ std::string Connection::get_fixed_length_size(std::string message)
 	return size;
 }
 
+std::string Connection::get_fixed_length_size(std::vector<char> data)
+{
+    std::stringstream stream;
+    stream << std::setw(SIZE_BYTES) << std::setfill('0') << data.size();
+    std::string size = stream.str();
+    return size;
+}
+
+
 void Connection::send_message(std::string message)
 {
 
@@ -44,10 +54,13 @@ void Connection::send_message(std::string message)
     std::string encapsulated_string = get_fixed_length_size(message) + message;
     encapsulated_string = MESSAGE_BEGIN_CHECK + encapsulated_string + MESSAGE_END_CHECK;
 	size_t total_bytes_sent = 0;
-    size_t bytes_sent = 0;
+    size_t bytes_sent = 0;	std::ifstream file("file_path", std::ios::binary);
+
+    std::vector<char> data = std::vector<char>(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+
     while (total_bytes_sent < encapsulated_string.size()) {
         std::string message_left = encapsulated_string.substr(bytes_sent);
-        bytes_sent = send(this->sock, message_left.c_str(), message_left.size(), 0);
+        bytes_sent = send(this->sock, data.data(), message_left.size(), 0);
         total_bytes_sent += bytes_sent;
         if (bytes_sent < 0) {
             throw Message_Not_Sent_Exception();
@@ -84,6 +97,24 @@ std::string Connection::recive_message()
     std::cout << decrypted_message << std::endl;
     return decrypted_message;
 }
+
+void Connection::send_message(std::vector<char> data)
+{
+    std::cout << "SENT MESSAGE" << std::endl;
+    std::cout << data.data() << std::endl;
+    send_message(std::to_string(data.size()));
+
+    size_t bytes_sent = 0;
+
+    while (!data.empty()) {
+        data.erase(data.begin(), data.begin() + bytes_sent);
+        bytes_sent = send(this->sock, data.data(), data.size(), 0);
+        if (bytes_sent < 0) {
+            throw Message_Not_Sent_Exception();
+        }
+    }
+}
+
 
 size_t Connection::get_size_from(std::string fixed_length_string)
 {

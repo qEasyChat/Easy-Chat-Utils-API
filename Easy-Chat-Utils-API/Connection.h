@@ -39,8 +39,13 @@ public:
     Connection(int port_number=0, const std::string ip="", const std::string username = "Anon");
     ~Connection();
     std::string get_fixed_length_size(std::string message);
+    std::string get_fixed_length_size(std::vector<char> data);
+
     void send_message(std::string message);
     std::string recive_message();
+
+    void send_message(std::vector<char> data);
+    std::vector<char> recive_bytes();
 
     SOCKET get_socket();
     void set_socket(SOCKET socket);
