@@ -100,7 +100,7 @@ std::string Connection::recive_message()
 
 void Connection::send_message(std::vector<char> data)
 {
-    std::cout << "SENT MESSAGE" << std::endl;
+    std::cout << "SENDING DATA" << std::endl;
     std::cout << data.data() << std::endl;
     send_message(std::to_string(data.size()));
 
@@ -113,6 +113,34 @@ void Connection::send_message(std::vector<char> data)
             throw Message_Not_Sent_Exception();
         }
     }
+}
+
+std::vector<char> Connection::recive_bytes()
+{
+    std::cout << "RECIVED DATA" << std::endl;
+    std::vector<char> data;
+
+    std::string data_size_str = recive_message();
+    size_t data_size = std::stoi(data_size_str);
+
+
+    std::string recv_string = get_message(SIZE_BYTES);
+    size_t message_size = get_size_from(recv_string);
+    if (message_size > 0) {
+        message = get_message(message_size);
+    }
+    else
+    {
+        throw Client_Down_Exception();
+    }
+    std::string ending = get_message(MESSAGE_END_SIZE);
+    if (ending != MESSAGE_END_CHECK)
+    {
+        return ENDING_NOT_FOUND_MESSAGE;
+    }
+    std::string decrypted_message = decrypt_message(message);
+    std::cout << decrypted_message << std::endl;
+    return decrypted_message;
 }
 
 
@@ -153,6 +181,28 @@ std::string Connection::get_message(size_t size)
     return message;
 
 }
+
+std::vector<char> Connection::get_bytes(size_t size)
+{
+    std::vector<char> data;
+    std::unique_ptr<char[]> buffer(new char[BUFFER_SIZE]);
+    size_t bytes_recived = 0;
+    while (bytes_recived < size) {
+        memset(buffer.get(), '\0', BUFFER_SIZE);
+        size_t len = recv(this->sock, buffer.get(), size - bytes_recived, 0);
+        if (len < 0) {
+            throw Socket_Error_Exception();
+        }
+        if (len == 0) {
+            throw Client_Down_Exception();
+        }
+        auto buffer_array = buffer.get();
+        data.insert(data.end(), &buffer_array[0], &buffer_array[bytes_recived]);
+        bytes_recived += len;
+    }
+    return data;
+}
+
 
 int Connection::socket_init() {
     WSADATA wsa_data;
