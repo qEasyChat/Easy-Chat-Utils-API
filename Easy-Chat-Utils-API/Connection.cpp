@@ -123,24 +123,17 @@ std::vector<char> Connection::recive_bytes()
     std::string data_size_str = recive_message();
     size_t data_size = std::stoi(data_size_str);
 
-
-    std::string recv_string = get_message(SIZE_BYTES);
-    size_t message_size = get_size_from(recv_string);
-    if (message_size > 0) {
-        message = get_message(message_size);
+    if (data_size > 0) {
+        data = get_bytes(data_size);
     }
     else
     {
         throw Client_Down_Exception();
     }
-    std::string ending = get_message(MESSAGE_END_SIZE);
-    if (ending != MESSAGE_END_CHECK)
-    {
-        return ENDING_NOT_FOUND_MESSAGE;
-    }
-    std::string decrypted_message = decrypt_message(message);
-    std::cout << decrypted_message << std::endl;
-    return decrypted_message;
+
+    std::cout << data.data() << std::endl;
+
+    return data;
 }
 
 

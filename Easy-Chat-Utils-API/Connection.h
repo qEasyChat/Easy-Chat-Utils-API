@@ -86,6 +86,7 @@ private:
 
 	size_t get_size_from(std::string fixed_length_string);
     std::string get_message(size_t size);
+    std::vector<char> get_bytes(size_t size);
     int socket_init();
     int socket_close();
     int socket_quit();
