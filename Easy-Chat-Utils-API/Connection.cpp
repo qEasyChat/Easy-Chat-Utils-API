@@ -47,27 +47,19 @@ std::string Connection::get_fixed_length_size(std::vector<char> data)
 
 void Connection::send_message(std::string message)
 {
-
-    std::cout << "SENT MESSAGE" << std::endl;
-    std::cout << message << std::endl;
     message = encrypt_message(message);
     std::string encapsulated_string = get_fixed_length_size(message) + message;
     encapsulated_string = MESSAGE_BEGIN_CHECK + encapsulated_string + MESSAGE_END_CHECK;
-	size_t total_bytes_sent = 0;
-    size_t bytes_sent = 0;	std::ifstream file("file_path", std::ios::binary);
-
-    std::vector<char> data = std::vector<char>(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-
+    size_t total_bytes_sent = 0;
+    size_t bytes_sent = 0;
     while (total_bytes_sent < encapsulated_string.size()) {
         std::string message_left = encapsulated_string.substr(bytes_sent);
-        bytes_sent = send(this->sock, data.data(), message_left.size(), 0);
+        bytes_sent = send(this->sock, message_left.c_str(), message_left.size(), 0);
         total_bytes_sent += bytes_sent;
         if (bytes_sent < 0) {
             throw Message_Not_Sent_Exception();
         }
     }
-
-    std::cout << message << std::endl;
 }
 
 std::string Connection::recive_message()
@@ -120,8 +112,8 @@ std::vector<char> Connection::recive_bytes()
     std::cout << "RECIVED DATA" << std::endl;
     std::vector<char> data;
 
-    std::string data_size_str = recive_message();
-    size_t data_size = std::stoi(data_size_str);
+    std::string data_size_message = recive_message();
+    size_t data_size = std::stoi(data_size_message);
 
     if (data_size > 0) {
         data = get_bytes(data_size);
@@ -190,7 +182,10 @@ std::vector<char> Connection::get_bytes(size_t size)
             throw Client_Down_Exception();
         }
         auto buffer_array = buffer.get();
-        data.insert(data.end(), &buffer_array[0], &buffer_array[bytes_recived]);
+        for (size_t i = 0; i < len; ++i)
+        {
+            data.push_back(buffer[i]);
+        }
         bytes_recived += len;
     }
     return data;
