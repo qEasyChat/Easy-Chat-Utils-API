@@ -90,7 +90,7 @@ std::string Connection::recive_message()
     return decrypted_message;
 }
 
-void Connection::send_message(std::vector<char> data)
+void Connection::send_message(std::vector<unsigned char> data)
 {
     std::cout << "SENDING DATA" << std::endl;
     std::cout << data.data() << std::endl;
@@ -100,17 +100,17 @@ void Connection::send_message(std::vector<char> data)
 
     while (!data.empty()) {
         data.erase(data.begin(), data.begin() + bytes_sent);
-        bytes_sent = send(this->sock, data.data(), data.size(), 0);
+        bytes_sent = send(this->sock, reinterpret_cast<const char*>(data.data()), data.size(), 0);
         if (bytes_sent < 0) {
             throw Message_Not_Sent_Exception();
         }
     }
 }
 
-std::vector<char> Connection::recive_bytes()
+std::vector<unsigned char> Connection::recive_bytes()
 {
     std::cout << "RECIVED DATA" << std::endl;
-    std::vector<char> data;
+    std::vector<unsigned char> data;
 
     std::string data_size_message = recive_message();
     size_t data_size = std::stoi(data_size_message);
@@ -167,9 +167,9 @@ std::string Connection::get_message(size_t size)
 
 }
 
-std::vector<char> Connection::get_bytes(size_t size)
+std::vector<unsigned char> Connection::get_bytes(size_t size)
 {
-    std::vector<char> data;
+    std::vector<unsigned char> data;
     std::unique_ptr<char[]> buffer(new char[BUFFER_SIZE]);
     size_t bytes_recived = 0;
     while (bytes_recived < size) {

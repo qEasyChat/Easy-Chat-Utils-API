@@ -44,8 +44,8 @@ public:
     void send_message(std::string message);
     std::string recive_message();
 
-    void send_message(std::vector<char> data);
-    std::vector<char> recive_bytes();
+    void send_message(std::vector<unsigned char> data);
+    std::vector<unsigned char> recive_bytes();
 
     SOCKET get_socket();
     void set_socket(SOCKET socket);
@@ -86,7 +86,7 @@ private:
 
 	size_t get_size_from(std::string fixed_length_string);
     std::string get_message(size_t size);
-    std::vector<char> get_bytes(size_t size);
+    std::vector<unsigned char> get_bytes(size_t size);
     int socket_init();
     int socket_close();
     int socket_quit();
